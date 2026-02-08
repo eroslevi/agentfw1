@@ -80,67 +80,72 @@ USER INPUT
     │           │
     │           ▼ (ARCH_PROMPT)
     │           │
-    │           ├─ Templates → ARCH_SPEC_TMP
-    │           ├─ Context → USR_SPEC
-    │           └─ LLM → Azure OpenAI
-    │                │
-    │                ▼
-    │           ARCH_SPEC (Markdown)
-    │           • Agents definition
-    │           • Tools definition
-    │           • Data flow
-    │           • Integration points
-    │                │
-    ├─┬──┬──────────┼──────────────────────┐
-    │ │  │          │                      │
-    │ │  │          ▼ (TECH_PROMPT)        ▼ (TEST_SPEC_PROMPT)
-    │ │  │          │                      │
-    │ │  │          ├─ Templates           ├─ Templates
-    │ │  │          ├─ TECH_SPEC_TMP       ├─ TEST_SPEC_TMP
-    │ │  │          ├─ Context             ├─ Context
-    │ │  │          ├─ ARCH_SPEC           ├─ ARCH_SPEC
-    │ │  │          ├─ LLM                 ├─ TECH_SPEC
-    │ │  │          │                      ├─ LLM
-    │ │  │          ▼                      │
-    │ │  │     TECH_SPEC               TEST_SPEC
-    │ │  │     • Classes                • Test cases
-    │ │  │     • Methods                • Assertions
-    │ │  │     • Signatures             • Coverage
-    │ │  │     • Types                  • Edge cases
-    │ │  │          │                      │
-    │ │  │          └──────────┬───────────┘
-    │ │  │                     │
-    │ │  │     ┌───────────────┴────────────────┐
-    │ │  │     │                                 │
-    │ │  │     ▼ (CODE_PROMPT)        ▼ (TEST_CODE_PROMPT)
-    │ │  │     │                                 │
-    │ │  │     ├─ TECH_SPEC                ├─ TEST_SPEC
-    │ │  │     ├─ CODE_PROMPT           ├─ TEST_CODE_PROMPT
-    │ │  │     ├─ LLM                   ├─ LLM
-    │ │  │     │                                 │
-    │ │  │     ▼                                 ▼
-    │ │  └─ SRC (Source Code)    TST (Test Suite)
-    │ │     • agents/              • tests/unit/
-    │ │     • tools/               • tests/integration/
-    │ │     • utils/               • tests/e2e/
-    │ │     • graph.py             • conftest.py
-    │ │     • main.py              • fixtures/
-    │ │              │                    │
-    │ └──────────────┴────────────────────┘
-    │                │
-    │                ▼ (Save to generated_systems)
-    │                │
-    │                ▼
-    │           RUN CHK
-    │           • Execute tests
-    │           • Check results
-    │           • Generate fixes (if needed)
-    │           • Rerun tests
-    │           • Report status
-    │                │
-    └────────────────┴─────────────────┐
-                                       ▼
-                               ✓ SYSTEM READY
+    │           ├─ Input: USR_SPEC
+    │           ├─ Template: ARCH_SPEC_TMP
+    │           ├─ LLM: Azure OpenAI
+    │           │
+    │           ▼
+    │      ARCH_SPEC (Markdown)
+    │      • Agents definition
+    │      • Tools definition
+    │      • Data flow
+    │      • Integration points
+    │           │
+    │           ├────────────────────────────────────┐
+    │           │                                    │
+    │           ▼ (TECH_PROMPT)               ▼ (TEST_SPEC_PROMPT)
+    │           │                             │
+    │           ├─ Input: ARCH_SPEC           ├─ Input: ARCH_SPEC + TECH_SPEC
+    │           ├─ Template: TECH_SPEC_TMP    ├─ Template: TEST_SPEC_TMP
+    │           ├─ LLM: Azure OpenAI          ├─ LLM: Azure OpenAI
+    │           │                             │
+    │           ▼                             │
+    │      TECH_SPEC (Markdown)               │
+    │      • Python Classes                   │
+    │      • Method Signatures                │
+    │      • Type Hints                       │
+    │      • Utilities                        │
+    │           │                             │
+    │           │                (Sequential) │
+    │           │                  dependency │
+    │           ├──────────────────────────────→
+    │           │                             │
+    │           │                             ▼
+    │           │                        TEST_SPEC
+    │           │                        • Test cases
+    │           │                        • Assertions
+    │           │                        • Coverage
+    │           │                        • Edge cases
+    │           │                             │
+    │           ▼ (CODE_PROMPT)               ▼ (TEST_CODE_PROMPT)
+    │           │                             │
+    │           ├─ Input: TECH_SPEC           ├─ Input: TEST_SPEC
+    │           ├─ Prompt: CODE_PROMPT        ├─ Prompt: TEST_CODE_PROMPT
+    │           ├─ LLM: Azure OpenAI          ├─ LLM: Azure OpenAI
+    │           │                             │
+    │           ▼                             ▼
+    │      SRC (Source Code)              TST (Test Suite)
+    │      • agents/                       • tests/unit/
+    │      • tools/                        • tests/integration/
+    │      • utils/                        • tests/e2e/
+    │      • graph.py                      • conftest.py
+    │      • main.py                       • fixtures/
+    │           │                             │
+    │           └──────────┬──────────────────┘
+    │                      │
+    │                      ▼ (Save to generated_systems/[system_name]/)
+    │                      │
+    │                      ▼
+    │                 RUN CHK
+    │                 • Execute tests (TST)
+    │                 • Check results
+    │                 • If fail: Generate fixes
+    │                 • Rerun tests (retry up to 3x)
+    │                 • Report status
+    │                      │
+    └──────────────────────┴──────────────┐
+                                          ▼
+                                  ✓ SYSTEM READY
 ```
 
 ## Framework Module Dependencies
@@ -370,29 +375,43 @@ START
   │
   ├─ User creates USR_SPEC (20 min)
   │
-  ├─ ARCH_PROMPT → ARCH_SPEC (2 min)
+  ├─ ARCH_PROMPT (Input: USR_SPEC)
   │
-  └─┬─────────────────────────────────┐
-    │                                 │
-    ▼ (SEQUENTIAL)             ▼ (PARALLEL)
-    │                               │
-    TECH_PROMPT                TEST_SPEC_PROMPT
-    └──→ TECH_SPEC                └──→ TEST_SPEC
-         │                             │
-         ▼ (SEQUENTIAL)         ▼ (SEQUENTIAL)
-         │                          │
-    CODE_PROMPT            TEST_CODE_PROMPT
-    └──→ SRC (source)          └──→ TST (tests)
-         │                          │
-         └──────┬──────────────────┘
-                ▼
-         Organize in
-         generated_systems/[system]/
-                │
-                ▼
-         RUN CHK
-         (Test & Fix)
-                │
+  ▼
+  ARCH_SPEC (2 min)
+  │
+  └─┬────────────────────────────────────┐
+    │                                    │
+    ▼ (SEQUENTIAL)              ▼ (Dependent on TECH_SPEC)
+    │                                    │
+    TECH_PROMPT                 TEST_SPEC_PROMPT
+    (Input: ARCH_SPEC)         (Input: ARCH_SPEC + TECH_SPEC)
+    │                                    │
+    ▼                                    │
+    TECH_SPEC (2 min)                    │
+    │                                    │
+    ├────────────────────────────────────→
+    │                                    │
+    │ (Dependency satisfied)             │
+    │                                    ▼
+    │                              TEST_SPEC (2 min)
+    │                                    │
+    ▼ (CODE_PROMPT)                  ▼ (TEST_CODE_PROMPT)
+    │                                    │
+    (Input: TECH_SPEC)          (Input: TEST_SPEC)
+    │                                    │
+    ▼                                    ▼
+    SRC (source code) (2 min)  TST (test suite) (2 min)
+    │                                    │
+    └────────────────┬───────────────────┘
+                     ▼
+             Organize in
+             generated_systems/[system]/
+                     │
+                     ▼
+             RUN CHK
+             (Test & Fix)
+                     │
           ┌─────┴──────┐
           ▼            ▼
     All Pass      Some Fail
