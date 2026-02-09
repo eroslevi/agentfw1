@@ -12,6 +12,8 @@ You have been provided with:
    - Success criteria
    - Constraints and limitations
 
+   Note: For this workflow the USR_SPEC will be provided directly in the LLM prompt context as a file named `usr_spec` (or `usr_spec.md`). Use the contents of that provided file as the authoritative USR_SPEC — do not attempt to load external workspace files.
+
 2. **Architectural Specification Template (ARCH_SPEC_TMP):**
    - Predefined structure and sections
    - Guidelines for agent and tool definitions
