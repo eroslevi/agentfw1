@@ -121,3 +121,7 @@ Generate:
 4. Main executable script or module
 
 The code should be immediately runnable after installing dependencies and configuring environment variables.
+
+## Important
+
+Do not ask for additional requirements or clarification. Generate complete, production-ready code based on the TECH_SPEC provided in context. If the TECH_SPEC contains ambiguities, resolve them with reasonable, standard implementations.

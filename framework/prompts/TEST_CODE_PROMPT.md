@@ -170,3 +170,7 @@ All tests should:
 - Fail clearly when code is broken
 - Be fast and deterministic
 - Have clear, descriptive names and docstrings
+
+## Important
+
+Do not ask for clarification or additional information. Generate complete, production-ready test code based solely on the TEST_SPEC and SRC provided in context. Make reasonable implementation choices for any ambiguities.

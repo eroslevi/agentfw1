@@ -133,3 +133,7 @@ Return the TEST_SPEC in Markdown format following the TEST_SPEC_TMP structure. F
 - Pre/post conditions
 
 The TEST_SPEC should be sufficiently detailed that developers can implement tests directly from it.
+
+## Important
+
+Do not ask for additional requirements or clarification. Generate a comprehensive TEST_SPEC based solely on the ARCH_SPEC and TECH_SPEC provided in context. Make reasonable coverage decisions based on best practices.

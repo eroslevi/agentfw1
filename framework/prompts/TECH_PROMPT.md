@@ -80,6 +80,4 @@ For each tool defined in ARCH_SPEC:
 
 Return the TECH_SPEC in Markdown format following the TECH_SPEC_TMP structure. Provide precise method signatures and implementation guidance that developers can use as a blueprint.
 
-## Implementation Constraints
-
-_[Any specific constraints or technology choices that should be enforced]_
+Do not ask for additional clarification — all necessary information is provided in the ARCH_SPEC context. Generate the complete TECH_SPEC based solely on what is provided.
